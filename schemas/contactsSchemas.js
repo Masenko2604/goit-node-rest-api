@@ -1,14 +1,13 @@
 import Joi from "joi";
 
-const Joi = require("joi");
+export const createContactSchema = Joi.object({
+  email: Joi.string().email({ minDomainSegments: 2 }).required(),
+  name: Joi.string().required(),
+  phone: Joi.string().required(),
+});
 
-const Joi = require("joi");
-
-const createContactSchema = Joi.object({
-    title: Joi.string().required(),
-    author: Joi.string().required(),
-})
-
-module.exports = {
-    createContactSchema,
-}
+export const updateContactSchema = Joi.object({
+  email: Joi.string().email({ minDomainSegments: 2 }),
+  name: Joi.string(),
+  phone: Joi.string(),
+});
