@@ -11,7 +11,7 @@ import {createContactSchema, updateContactSchema} from "../schemas/contactsSchem
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/", ListContacts);
 
 contactsRouter.get("/:id", getOneContact);
 
