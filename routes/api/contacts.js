@@ -1,5 +1,5 @@
 import express from "express";
-import contactsControllers from "../../controllers/contactsControllers.js";
+import contactsControllers from "../../controllers/contactControllers.js";
 import { validateBody } from "../../decorators/validateBody.js";
 import bodyEmpty from "../../middlewares/bodyEmpty.js";
 import {
