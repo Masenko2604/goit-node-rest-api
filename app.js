@@ -1,29 +1,27 @@
 import express from "express";
-import logger from "morgan";
+import morgan from "morgan";
 import cors from "cors";
-import { contactsRouter } from "./routes/api/contacts.js";
-import dotenv from "dotenv/config.js";
+
+import contactsRouter from "./routes/contactsRouter.js";
 
 const app = express();
 
-const formatsLogger = app.get("env") === "development" ? "dev" : "short";
-
-app.use(logger(formatsLogger));
+app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
 
-app.use((req, res) => {
-  res.status(404).json({ message: "Not found" });
+app.use((_, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({ message: err.message });
+  const { status = 500, message = "Server error" } = err;
+  res.status(status).json({ message });
 });
 
-app.listen(3000, () => {
-  console.log("Server running. Use our API on port: 3000");
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server is running. Use our API on port: ${port}`);
 });
-
-export default app;
