@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const DB_HOST = "mongodb+srv://Tanja:XSrgWhsgZlIVDRIU@cluster0.tvzwrda.mongodb.net/db-contacts?retryWrites=true&w=majority&appName=Cluster0";
 mongoose.connect(DB_HOST)
-  .then(() => console.log("Datebase connect success"))
+  .then(() => console.log("Database connection successful"))
    .catch(error => console.log(error.message))
 
 
