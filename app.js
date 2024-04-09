@@ -1,37 +1,43 @@
-// XSrgWhsgZlIVDRIU 
-
-const mongoose = require("mongoose");
-
-const DB_HOST = "mongodb+srv://Tanja:XSrgWhsgZlIVDRIU@cluster0.tvzwrda.mongodb.net/db-contacts?retryWrites=true&w=majority&appName=Cluster0";
-mongoose.connect(DB_HOST)
-  .then(() => console.log("Database connection successful"))
-   .catch(error => console.log(error.message))
 
 
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-// import express from "express";
-// import morgan from "morgan";
-// import cors from "cors";
+import contactsRouter from "./routes/contactsRouter.js";
 
-// import contactsRouter from "./routes/contactsRouter.js";
+dotenv.config();
 
-// const app = express();
+const app = express();
 
-// app.use(morgan("tiny"));
-// app.use(cors());
-// app.use(express.json());
+const { DB_HOST, PORT = 3000 } = process.env;
 
-// app.use("/api/contacts", contactsRouter);
+mongoose.set("strictQuery", true);
+mongoose
+  .connect(DB_HOST)
+  .then(() => {
+    app.listen(PORT);
+    console.log("Database connection successful.");
+    console.log(`port: ${PORT}`);
+  })
+  .catch((error) => {
+    console.log(error.message);
+    process.exit(1);
+  });
 
-// app.use((_, res) => {
-//   res.status(404).json({ message: "Route not found" });
-// });
+app.use(morgan("tiny"));
+app.use(cors());
+app.use(express.json());
 
-// app.use((err, req, res, next) => {
-//   const { status = 500, message = "Server error" } = err;
-//   res.status(status).json({ message });
-// });
+app.use("/api/contacts", contactsRouter);
 
-// app.listen(3000, () => {
-//   console.log("Server is running. Use our API on port: 3000");
-// });
+app.use((_, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+app.use((err, req, res, next) => {
+  const { status = 500, message = "Server error" } = err;
+  res.status(status).json({ message });
+});
