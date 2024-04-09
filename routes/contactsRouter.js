@@ -1,24 +1,51 @@
-import express from "express";
-import {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateContact,
-} from "../controllers/contactsControllers.js";
-import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
-import validateBody from "../helpers/validateBody.js";
+const express = require("express");
 
-const contactsRouter = express.Router();
+const ctrl = require("../../controllers/contacts");
 
-contactsRouter.get("/", getAllContacts);
+const {validateBody, isValidId} = require("../../middlewares");
 
-contactsRouter.get("/:id", getOneContact);
+const {schemas} = require("../../models/contact");
 
-contactsRouter.delete("/:id", deleteContact);
+const router = express.Router();
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+router.get("/", ctrl.getAll);
 
-contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
+router.get("/:id", isValidId, ctrl.getById);
 
-export default contactsRouter;
+router.post("/", validateBody(schemas.addSchema), ctrl.add);
+
+router.put("/:id", isValidId, validateBody(schemas.addSchema), ctrl.updateById);
+
+router.patch("/:id/favorite", isValidId, validateBody(schemas.updateFavoriteSchema), ctrl.updateFavorite);
+
+router.delete("/:id", isValidId, ctrl.deleteById);
+
+module.exports = router;
+
+
+
+
+// import express from "express";
+// import {
+//   getAllContacts,
+//   getOneContact,
+//   deleteContact,
+//   createContact,
+//   updateContact,
+// } from "../controllers/contactsControllers.js";
+// import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
+// import validateBody from "../helpers/validateBody.js";
+
+// const contactsRouter = express.Router();
+
+// contactsRouter.get("/", getAllContacts);
+
+// contactsRouter.get("/:id", getOneContact);
+
+// contactsRouter.delete("/:id", deleteContact);
+
+// contactsRouter.post("/", validateBody(createContactSchema), createContact);
+
+// contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
+
+// export default contactsRouter;
