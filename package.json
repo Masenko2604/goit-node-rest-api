@@ -2,7 +2,7 @@
   "name": "goit-node-rest-api",
   "type": "module",
   "scripts": {
-    "start:dev": "node server.js",
+    "start": "node ./app.js",
     "dev": "nodemon ./app.js"
   },
   "dependencies": {
