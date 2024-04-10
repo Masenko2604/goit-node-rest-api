@@ -1,56 +1,35 @@
-// import {promises as fs} from "fs"
-// import { nanoid } from "nanoid";
-// import path from "path"
+import { Contact } from "../schemas/contact.js";
 
-// const contactsPath = path.join("db", "contacts.json");
+export async function listContacts() {
+  //Get all data from bd
+  return Contact.find();
+}
 
-// export async function listContacts() {
-//         const getJson = await fs.readFile(contactsPath);
-//     return JSON.parse(getJson);
-//   }
-  
-//   export async function getContactById(contactId) {
-//     const getJsonById = await listContacts();
-//     const find = getJsonById.find((item) => item.id === contactId)
-//     return find;
-// }
-  
-//   export async function removeContact(contactId) {
-//     const removeJsonById = await fs.readFile(contactsPath);
-//     const get = JSON.parse(removeJsonById)
-//     const find = get.findIndex((item) => item.id === contactId)
-//     if (find === -1) {
-//        return null
-//     }
-//     const removed = get.splice(find, 1)[0];
-//     await fs.writeFile(contactsPath, JSON.stringify(get))
-//     return removed;
-//   }
-  
-//   export async function addContact({name, email, phone}) {
-//     const addJsonById = await fs.readFile(contactsPath);
-//     const contacts = JSON.parse(addJsonById);
-//     const newContact = { id: nanoid(), name, email, phone };
-//     contacts.push(newContact);
-//     await fs.writeFile(contactsPath, JSON.stringify(contacts));
-//         return newContact
-//   }
+export async function getContactById(contactId) {
+  //Get one contact from db
+  return Contact.findById(contactId);
+}
 
-// export async function updateContactById(id, {name, email, phone}) {
-//   const contact = await listContacts();
-//   const find = contact.findIndex((item) => item.id === id);
-//   if (find === -1) {
-//     return null;
-//   };
-//   if (name) {
-//     contact[find].name = name;
-//   }
-//   if (email) {
-//     contact[find].email = email;
-//   }
-//   if (phone) {
-//     contact[find].phone = phone;
-//   }
-//   await fs.writeFile(contactsPath, JSON.stringify(contact, null, 2));
-//   return contact[find];
-// }
+export async function removeContact(contactId) {
+  //Get one contact from db and delete
+  return Contact.findByIdAndDelete(contactId);
+}
+
+export async function addContact(name, email, phone, favorite) {
+  //Post new contact to db
+  return Contact.create({ name, email, phone, favorite });
+}
+
+export async function changeContact(contactID, name, email, phone, favorite) {
+  //Find contact by id and update field/fields
+  return Contact.findByIdAndUpdate(
+    contactID,
+    { contactID, name, email, phone, favorite },
+    { new: true },
+  );
+}
+
+export async function updateStatusContact(contactID, favorite) {
+  //Find contact by id and change field favorite
+  return Contact.findByIdAndUpdate(contactID, { favorite }, { new: true });
+}

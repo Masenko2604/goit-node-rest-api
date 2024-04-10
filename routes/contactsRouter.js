@@ -1,51 +1,28 @@
-const express = require("express");
+import express from "express";
+import {
+  getAllContacts,
+  getOneContact,
+  deleteContact,
+  createContact,
+  updateContact,
+  updateFavorite,
+} from "../controllers/contactsControllers.js";
+import validateBody from "../helpers/validateBody.js";
+import {createContactSchema, updateContactSchema, updateFavoriteSchema} from "../schemas/contactsSchemas.js";
+import {isValidId} from "../helpers/isValidId.js";
 
-const ctrl = require("../../controllers/contacts");
+const contactsRouter = express.Router();
 
-const {validateBody, isValidId} = require("../../middlewares");
+contactsRouter.get("/", getAllContacts);
 
-const {schemas} = require("../../models/contact");
+contactsRouter.get("/:id", isValidId, getOneContact);
 
-const router = express.Router();
+contactsRouter.delete("/:id", isValidId, deleteContact);
 
-router.get("/", ctrl.getAll);
+contactsRouter.post("/", validateBody(createContactSchema), createContact);
 
-router.get("/:id", isValidId, ctrl.getById);
+contactsRouter.put("/:id", validateBody(updateContactSchema), isValidId, updateContact);
 
-router.post("/", validateBody(schemas.addSchema), ctrl.add);
+contactsRouter.patch("/:id/favorite", validateBody(updateFavoriteSchema), isValidId, updateFavorite)
 
-router.put("/:id", isValidId, validateBody(schemas.addSchema), ctrl.updateById);
-
-router.patch("/:id/favorite", isValidId, validateBody(schemas.updateFavoriteSchema), ctrl.updateFavorite);
-
-router.delete("/:id", isValidId, ctrl.deleteById);
-
-module.exports = router;
-
-
-
-
-// import express from "express";
-// import {
-//   getAllContacts,
-//   getOneContact,
-//   deleteContact,
-//   createContact,
-//   updateContact,
-// } from "../controllers/contactsControllers.js";
-// import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
-// import validateBody from "../helpers/validateBody.js";
-
-// const contactsRouter = express.Router();
-
-// contactsRouter.get("/", getAllContacts);
-
-// contactsRouter.get("/:id", getOneContact);
-
-// contactsRouter.delete("/:id", deleteContact);
-
-// contactsRouter.post("/", validateBody(createContactSchema), createContact);
-
-// contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
-
-// export default contactsRouter;
+export default contactsRouter;
