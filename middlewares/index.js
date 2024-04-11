@@ -1,5 +1,9 @@
-import validateJWT from "./validateJWT.js";
-import isValidId from "./isValidId.js";
-import validateBody from "./validateBody.js";
+const validateBody = require("./validateBody");
+const isValidId = require("./isValidId")
+const authenticate = require("./authenticate")
 
-export { validateJWT, isValidId, validateBody };
+module.exports = {
+    validateBody,
+    isValidId,
+    authenticate,
+}
