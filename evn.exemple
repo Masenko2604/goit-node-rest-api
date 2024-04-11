@@ -1,0 +1,3 @@
+DB_HOST= # Mongo secret
+
+SECRET_KEY= # JWT secret

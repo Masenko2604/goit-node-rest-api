@@ -1,22 +1,51 @@
 import express from "express";
+import { contactsControllers } from "../controllers/contacts.js";
+import { validateBody, validateJWT, isValidId } from "../middlewars/index.js";
 import {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateContact,
-} from "../controllers/contactsControllers.js";
+  createContactSchema,
+  updateContactSchema,
+  updateFavoriteSchema,
+} from "../schemas/contactsSchemas.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/", validateJWT, contactsControllers.getAllContacts);
 
-contactsRouter.get("/:id", getOneContact);
+contactsRouter.get(
+  "/:id",
+  validateJWT,
+  isValidId,
+  contactsControllers.getOneContact
+);
 
-contactsRouter.delete("/:id", deleteContact);
+contactsRouter.post(
+  "/",
+  validateJWT,
+  validateBody(createContactSchema),
+  contactsControllers.createContact
+);
 
-contactsRouter.post("/", createContact);
+contactsRouter.delete(
+  "/:id",
+  validateJWT,
+  isValidId,
+  contactsControllers.deleteContact
+);
 
-contactsRouter.put("/:id", updateContact);
+contactsRouter.put(
+  "/:id",
+  validateJWT,
+  isValidId,
+  validateBody(updateContactSchema),
+  contactsControllers.updateContact
+);
+
+contactsRouter.patch(
+  "/:id/favorite",
+  validateJWT,
+  validateBody(updateFavoriteSchema),
+  isValidId,
+  contactsControllers.updateFavorite
+);
 
 export default contactsRouter;
