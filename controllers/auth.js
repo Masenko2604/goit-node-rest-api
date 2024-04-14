@@ -1,80 +1,94 @@
+import "dotenv/config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import 'dotenv/config';
-import { HttpError } from "../helpers/HttpError.js";
 import { User } from "../models/users.js";
 
 const { SECRET_KEY } = process.env;
+console.log(SECRET_KEY);
 
-export const register = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (user) {
-            throw HttpError(409, "Email in use");
-        }
-        const hashPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ ...req.body, password: hashPassword });
-        res.status(201).json(
-            {
-                "users": {
-                    email: newUser.email,
-                    subscription: newUser.subscription,
-                }
-            })
-    }
-    catch (error) {
-        next(error)
-    }
+const register = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  console.log(user);
+  if (user) {
+    return res.status(409).json({ message: "Email in use" });
+  }
+
+  const hashPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await User.create({ ...req.body, password: hashPassword });
+  res.status(201).json({
+    users: { email: newUser.email, subscription: newUser.subscription },
+  });
 };
-export const login = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) {
-            throw HttpError(401, "Email or password is wrong");
-        }
-        const passwordCompare = await bcrypt.compare(password, user.password);
-        if (!passwordCompare) {
-            throw HttpError(401, "Email or password is wrong");
-        }
-        const payload = {
-            id: user._id
-        }
-        console.log(SECRET_KEY);
-        const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
-        await User.findOneAndUpdate(user._id, { token });
 
-        res.json({
-            token,
-            "users": {
-                email: user.email,
-                subscription: user.subscription,
-            }
-        })
-    } catch (error) {
-        next(error)
-    }
-}
-export const getCurrent = async (req, res, next) => {
-    try {
-        const { email, subscription } = req.user;
-        res.json({
-            email,
-            subscription,
-        })
-    } catch (error) {
-        next(error)
-    }
-}
-export const logout = async (req, res, next) => {
-    try {
-        const { _id } = req.user;
-        await User.findOneAndUpdate(_id, { token: '' });
-        throw HttpError(204);
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(401).json({ message: "Email or password is wrong" });
+  }
+  const passwordCompare = await bcrypt.compare(password, user.password);
+  if (!passwordCompare) {
+    return res.status(401).json({ message: "Email or password is wrong" });
+  }
 
+  const payload = {
+    id: user._id,
+  };
 
-    } catch (error) {
-        next(error)
-    }
-}
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+  await User.findByIdAndUpdate(user._id, { token });
+  res.json({
+    token,
+    user: { email: user.email, subscription: user.subscription },
+  });
+};
+
+const getCurrent = async (req, res) => {
+  const { token, email, subscription } = req.user;
+
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  res.json({
+    email,
+    subscription,
+  });
+};
+
+const logout = async (req, res) => {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: "" });
+  res.status(204).json({
+    message: "Logout success. Content not found",
+  });
+};
+console.log(logout);
+const patchSubscription = async (req, res) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+  const result = await User.findByIdAndUpdate(
+    _id,
+    { subscription },
+    { new: true }
+  );
+  if (!result) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  if (result.token === null) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  res.status(200).json({
+    email: result.email,
+    subscription: result.subscription,
+  });
+};
+
+export const userControllers = {
+  register,
+  login,
+  getCurrent,
+  logout,
+  patchSubscription,
+};

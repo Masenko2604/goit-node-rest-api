@@ -2,84 +2,81 @@
 import {HttpError} from "../helpers/HttpError.js";
 import { Contact } from '../models/contact.js';
 
-export const getAllContacts = async (req, res, next) => {
-    try {
-        const { _id: owner } = req.user;
-        const { page = 1, limit = 20} = req.query;
-        const skip = (page - 1) * limit;
-        const result = await Contact.find({owner}, "", { skip, limit:Number(limit)});
-        res.json(result);
-    }
-    catch (error) {
-        next(error)
-    }
+const getAllContacts = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  const result = await Contact.find({ owner }, "", {
+    skip,
+    limit: Number(limit),
+  }).populate("owner", "name email");
+  res.json(result);
 };
 
-export const getOneContact = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findOne({_id:id}).where("owner").equals(owner);
-       
-        if (!result) {
-            throw HttpError(404);
-        }
-        res.json(result);
-    } catch (error) {
-        next(error)
-    }
+const getOneContact = async (req, res) => {
+  const { id } = req.params;
+  const { _id: owner } = req.user;
+  const result = await Contact.findOne({ _id: id })
+    .where("owner")
+    .equals(owner);
+  if (!result) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  res.status(200).json(result);
 };
 
-export const deleteContact = async (req, res, next) => { 
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findByIdAndDelete(id).where("owner").equals(owner);
-        if (!result) {
-            throw HttpError(404);
-        }
-        res.json({
-            message:'Delete success', result
-        })
-    } catch (error) {
-        next(error)
-    }
+const createContact = async (req, res) => {
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
+  res.status(201).json(result);
 };
 
-export const createContact = async (req, res, next) => {
-    try {
-        const { _id: owner } = req.user;
-        const result = await Contact.create({...req.body, owner});
-        res.status(201).json(result)
-
-    } catch (error) {
-        next(error)
-    }
+const deleteContact = async (req, res) => {
+  const { id } = req.params;
+  const { _id: owner } = req.user;
+  const result = await Contact.findByIdAndDelete(id)
+    .where("owner")
+    .equals(owner);
+  if (!result) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  res.json({ message: "Delete success" });
 };
 
-export const updateContact = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findByIdAndUpdate(id, req.body, { new: true }).where("owner").equals(owner);
-        if (!result) {
-            throw HttpError(404, error.message)
-        }
-        res.status(200).json(updatedContact);
-    } catch (error) {
-        next(error)
-    }
+const updateContact = async (req, res) => {
+  const { id } = req.params;
+  const { _id: owner } = req.user;
+  const result = await Contact.findByIdAndUpdate(id, req.body, { new: true })
+    .where("owner")
+    .equals(owner);
+  if (!result) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  res.json(result);
 };
-export const updateFavorite = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findByIdAndUpdate(id, req.body, { new: true }).where("owner").equals(owner);
-        if (!result) {
-            throw HttpError(404, error.message)
-        }
-        res.status(200).json(updatedContact);
-    } catch (error) {
-        next(error)
-    }
+
+const updateFavorite = async (req, res) => {
+  const { id } = req.params;
+  const { _id: owner } = req.user;
+  const { favorite } = req.body;
+  const result = await Contact.findByIdAndUpdate(
+    id,
+    { favorite },
+    { new: true }
+  )
+    .where("owner")
+    .equals(owner);
+  if (!result) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  res.json(result);
+};
+
+export const contactsControllers = {
+  getAllContacts,
+  getOneContact,
+  createContact,
+  deleteContact,
+  updateContact,
+  updateFavorite,
 };
