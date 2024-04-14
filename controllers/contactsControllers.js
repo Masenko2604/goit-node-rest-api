@@ -20,7 +20,7 @@ export const getOneContact = async (req, res, next) => {
         const { id } = req.params;
         const { _id: owner } = req.user;
         const result = await Contact.findOne({_id:id}).where("owner").equals(owner);
-        // const result = await Contact.findById(id);
+       
         if (!result) {
             throw HttpError(404);
         }
@@ -63,9 +63,9 @@ export const updateContact = async (req, res, next) => {
         const { _id: owner } = req.user;
         const result = await Contact.findByIdAndUpdate(id, req.body, { new: true }).where("owner").equals(owner);
         if (!result) {
-            throw HttpError(400, error.message)
+            throw HttpError(404, error.message)
         }
-        res.json(result);
+        res.status(200).json(updatedContact);
     } catch (error) {
         next(error)
     }
@@ -76,9 +76,9 @@ export const updateFavorite = async (req, res, next) => {
         const { _id: owner } = req.user;
         const result = await Contact.findByIdAndUpdate(id, req.body, { new: true }).where("owner").equals(owner);
         if (!result) {
-            throw HttpError(400, error.message)
+            throw HttpError(404, error.message)
         }
-        res.json(result);
+        res.status(200).json(updatedContact);
     } catch (error) {
         next(error)
     }
