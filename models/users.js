@@ -1,31 +1,28 @@
 import { Schema, model } from "mongoose";
-import { HandleMongooseError } from "../helpers/index.js";
+import { HandleMongooseError } from "../helpers/HandleMongooseError.js";
 
-const userSchema = new Schema(
-  {
-    password: {
-      type: String,
-      minlength: 6,
-      required: [true, "Password is required"],
-    },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-    },
-    subscription: {
-      type: String,
-      enum: ["starter", "pro", "business"],
-      default: "starter",
-    },
+const userSchema = new Schema({
+        password: {
+            type: String,
+            required: [true, 'Set password for user'],
+        },
+        email: {
+            type: String,
+            required: [true, 'Email is required'],
+            unique: true,
+        },
+        subscription: {
+            type: String,
+            enum: ["starter", "pro", "business"],
+            default: "starter"
+        },
     token: {
-      type: String,
-      default: null,
-    },
-  },
-  { versionKey: false }
-);
+        type: String,
+        default: ""
+    }
+
+}, { versionKey: false, timestamps: true })
 
 userSchema.post("save", HandleMongooseError);
-
-export const User = model("user", userSchema);
+ const User = model("user", userSchema);
+export { User };
