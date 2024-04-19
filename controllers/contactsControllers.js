@@ -1,85 +1,81 @@
+const asyncHandler = require("express-async-handler");
+const contactsService = require("../services/contactsService");
+const HttpError = require("../helpers/HttpError");
 
-import {HttpError} from "../helpers/HttpError.js";
-import { Contact } from '../models/contact.js';
+class ContactsController {
+  getAll = asyncHandler(async (req, res) => {
+    const { _id: owner } = req.user;
+    const { page = 1, limit = 10, ...filterParams } = req.query;
+    const skip = (page - 1) * limit;
+    const filter = { owner, ...filterParams };
+    const contacts = await contactsService.findAllContacts(filter, skip, limit);
 
-export const getAllContacts = async (req, res, next) => {
-    try {
-        const { _id: owner } = req.user;
-        const { page = 1, limit = 20} = req.query;
-        const skip = (page - 1) * limit;
-        const result = await Contact.find({owner}, "", { skip, limit:Number(limit)});
-        res.json(result);
+    if (!contacts) {
+      throw HttpError(400, "Unable to fetch contacts");
     }
-    catch (error) {
-        next(error)
-    }
-};
+    res.status(200);
+    res.json({ code: 200, contacts, quantity: contacts.length });
+  });
 
-export const getOneContact = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findOne({_id:id}).where("owner").equals(owner);
-   
-        if (!result) {
-            throw HttpError(404);
-        }
-        res.json(result);
-    } catch (error) {
-        next(error)
-    }
-};
+  getById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { _id: owner } = req.user;
 
-export const deleteContact = async (req, res, next) => { 
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findByIdAndDelete(id).where("owner").equals(owner);
-        if (!result) {
-            throw HttpError(404);
-        }
-        res.json({
-            message:'Delete success', result
-        })
-    } catch (error) {
-        next(error)
-    }
-};
+    const contact = await contactsService.findOneContact({
+      _id: id,
+      owner,
+    });
 
-export const createContact = async (req, res, next) => {
-    try {
-        const { _id: owner } = req.user;
-        const result = await Contact.create({...req.body, owner});
-        res.status(201).json(result)
+    if (!contact) {
+      throw HttpError(400, `Contact with id: ${id} is not found`);
+    }
 
-    } catch (error) {
-        next(error)
-    }
-};
+    res.status(200);
+    res.json({ code: 200, contact });
+  });
 
-export const updateContact = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findByIdAndUpdate(id, req.body, { new: true }).where("owner").equals(owner);
-        if (!result) {
-            throw HttpError(400, error.message)
-        }
-        res.json(result);
-    } catch (error) {
-        next(error)
+  add = asyncHandler(async (req, res) => {
+    const { _id: owner } = req.user;
+    const contact = await contactsService.addContact({ ...req.body, owner });
+
+    if (!contact) {
+      throw HttpError(400, "Unable to save contact");
     }
-};
-export const updateFavorite = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { _id: owner } = req.user;
-        const result = await Contact.findByIdAndUpdate(id, req.body, { new: true }).where("owner").equals(owner);
-        if (!result) {
-            throw HttpError(400, error.message)
-        }
-        res.json(result);
-    } catch (error) {
-        next(error)
+
+    res.status(201);
+    res.json({ code: 201, contact });
+  });
+
+  update = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+    const contact = await contactsService.updateContact(
+      { _id: id, owner },
+      req.body
+    );
+    console.log(contact);
+    if (!contact) {
+      throw HttpError(404, "Not Found");
     }
-};
+    res.status(201).json(contact);
+  });
+
+  remove = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+
+    const contact = await contactsService.removeContact({
+      _id: id,
+      owner,
+    });
+
+    if (!contact) {
+      throw HttpError(400, `Contact with id: ${id} is not found`);
+    }
+
+    res.status(200);
+    res.json({ code: 200, message: `Contact: ${contact.name} deleted` });
+  });
+}
+
+module.exports = new ContactsController();
