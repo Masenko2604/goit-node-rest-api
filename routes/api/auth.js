@@ -1,17 +1,23 @@
-import express from "express";
-import { getCurrent, login, logout, register, updateAvatar } from "../../controllers/auth.js";
-import { authenticate } from "../../middlewares/authenticate.js";
-import { upload } from "../../middlewares/upload.js";
-import {validateBody }from "../../middlewares/validateBody.js";
-import { schemas } from "../../schemas/usersSchemas.js";
+const express = require("express");
 
+const ctrl = require("../../controllers/auth");
 
- const authRouter = express.Router();
+const {validateBody, authenticate, upload} = require("../../middlewares");
 
-authRouter.post("/register", validateBody(schemas.registerSchema), register);
-authRouter.post("/login", validateBody(schemas.loginSchema), login);
-authRouter.get("/current", authenticate, getCurrent);
-authRouter.post("/logout", authenticate, logout);
-authRouter.patch("/avatars",authenticate,upload.single("avatar"), updateAvatar)
+const {schemas} = require("../../models/user");
 
-export {authRouter};
+const router = express.Router();
+
+// signup
+router.post("/register", validateBody(schemas.registerSchema), ctrl.register);
+
+// signin
+router.post("/login", validateBody(schemas.loginSchema), ctrl.login);
+
+router.get("/current", authenticate, ctrl.getCurrent);
+
+router.post("/logout", authenticate, ctrl.logout);
+
+router.patch("/avatars", authenticate, upload.single("avatar"), ctrl.updateAvatar);
+
+module.exports = router;
