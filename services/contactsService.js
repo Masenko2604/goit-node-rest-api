@@ -1,6 +1,6 @@
 const contactModel = require("../models/contactModel");
 
-class contactsService {
+class ContactsService {
   findAllContacts = async (filter, skip, limit) => {
     const contacts = await contactModel.find(filter, "-createdAt -updatedAt", {
       skip,
@@ -33,4 +33,4 @@ class contactsService {
   };
 }
 
-module.exports = new contactsService();
+module.exports = new ContactsService();
