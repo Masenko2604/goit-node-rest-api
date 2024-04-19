@@ -1,24 +1,16 @@
-const Joi = require("joi");
+import Joi from "joi";
 
-const validEmail =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-const userSignSchema = Joi.object({
-  email: Joi.string().pattern(validEmail).required(),
-  password: Joi.string().min(6).required(),
-  avatar: Joi.string(),
+const registerSchema = Joi.object({
+    password: Joi.string().min(4).required(),
+    email: Joi.string().email().required(),
+    subscription: Joi.string()
+});
+const loginSchema = Joi.object({
+    password: Joi.string().min(4).required(),
+    email: Joi.string().email().required(),
 });
 
-const userUpdateStatusSchema = Joi.object({
-  subscription: Joi.string().required(),
-});
-
-const userUpdateAvatarSchema = Joi.object({
-  avatar: Joi.any().required(),
-});
-
-module.exports = {
-  userSignSchema,
-  userUpdateStatusSchema,
-  userUpdateAvatarSchema,
-};
+export const schemas = {
+    registerSchema,
+    loginSchema
+}

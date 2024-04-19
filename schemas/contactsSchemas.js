@@ -1,26 +1,20 @@
-const Joi = require("joi");
+import Joi from "joi";
 
-const add = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string()
-    .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
-    .required(),
-  phone: Joi.string().required(),
-  favorite: Joi.boolean(),
+export const createContactSchema = Joi.object({
+    name: Joi.string().required(),
+    email: Joi.string().required(),
+    phone: Joi.string().required(),
+    favorite: Joi.boolean(),
+
+  
+})
+
+export const updateContactSchema = Joi.object({
+    name: Joi.string(),
+    email: Joi.string(),
+    phone: Joi.string(),
+    favorite: Joi.boolean()
 });
-
-const update = Joi.object({
-  name: Joi.string(),
-  email: Joi.string().email({
-    minDomainSegments: 2,
-    tlds: { allow: ["com", "net"] },
-  }),
-  phone: Joi.string(),
-  favorite: Joi.boolean(),
-});
-
-const updateStatus = Joi.object({
-  favorite: Joi.boolean().required(),
-});
-
-module.exports = { add, update, updateStatus };
+export const updateFavoriteSchema = Joi.object({
+    favorite: Joi.boolean().required()
+})

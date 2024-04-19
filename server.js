@@ -1,22 +1,16 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import 'dotenv/config';
+import { app } from "./app.js";
 
-require("colors");
+const { DB_HOST, PORT = 3000 } = process.env;
 
-const app = require("./app");
+mongoose.connect(DB_HOST)
+    .then(() => {
+        app.listen(PORT);
+        console.log("Database connection successful");
+    })
+    .catch((err) => {
+        console.log(err.message);
+        process.exit(1);
 
-const { DB_HOST, PORT } = process.env;
-
-mongoose
-  .connect(DB_HOST)
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(
-        `Server running. Use our API on port: ${PORT}`.green.italic.bold
-      );
-    });
-    console.log("Database connection successful".green.italic.bold);
-  })
-  .catch((error) => {
-    console.log(error.message.red.italic.bold);
-    process.exit(1);
-  });
+    })
