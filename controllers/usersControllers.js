@@ -1,84 +1,51 @@
-const asyncHandler = require("express-async-handler");
-const HttpError = require("../helpers/HttpError");
-const usersAuthService = require("../services/userAuthService");
+import { catchAsync } from "../helpers/catchAsync.js";
+import {
+  createUserService,
+  loginUserService,
+  logoutUserService,
+  updateUserService,
+} from "../services/userServices.js";
 
-class UsersController {
-  signup = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+export const createUser = catchAsync(async (req, res) => {
+  const { newUser } = await createUserService(req.body);
 
-    const newUser = await usersAuthService.register(email, password, req.body);
-
-    res.status(201).json({
-      user: {
-        email: newUser.email,
-        subscription: newUser.subscription,
-        avatarURL: newUser.avatarURL,
-      },
-    });
+  res.status(201).json({
+    user: { email: newUser.email, subscription: newUser.subscription },
   });
+});
 
-  signin = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+export const loginUser = catchAsync(async (req, res) => {
+  const { user, token } = await loginUserService(req.body);
 
-    const { updatedUser, token } = await usersAuthService.login(
-      email,
-      password
-    );
-
-    res.json({
-      token,
-      user: {
-        email: updatedUser.email,
-        subscription: updatedUser.subscription,
-        avatarURL: updatedUser.avatarURL,
-      },
-    });
+  res.status(200).json({
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+    token,
   });
+});
 
-  getCurrentUser = asyncHandler(async (req, res) => {
-    const { email, subscription } = req.user;
+export const currentUser = (req, res) => {
+  const currentUser = req.user;
 
-    if (!email) {
-      throw HttpError(401, "Not authorized");
-    }
-
-    res.json({
-      email,
-      subscription,
-    });
+  res.status(200).json({
+    email: currentUser.email,
+    subscription: currentUser.subscription,
   });
+};
 
-  signout = asyncHandler(async (req, res) => {
-    const { _id } = req.user;
-    const result = await usersAuthService.logout(_id);
-    if (!result) {
-      throw HttpError(401, "Not authorized");
-    }
+export const logoutUser = catchAsync(async (req, res) => {
+  const id = req.userId;
 
-    res.status(204).json({ message: "Logout Success" });
+  await logoutUserService(id);
+  res.sendStatus(204);
+});
+
+export const updateUser = catchAsync(async (req, res) => {
+  // add validator
+  const updatedUser = await updateUserService(req.body, req.user, req.file);
+  res.status(200).json({
+    avatarUrl: updatedUser.avatarUrl,
   });
-
-  onChangeSubscription = asyncHandler(async (req, res) => {
-    const { subscription } = req.body;
-    const { _id } = req.user;
-
-    const user = await usersAuthService.changeStatus(_id, subscription);
-
-    res.status(201).json({ user: { email: user.email, subscription } });
-  });
-
-  onChangeAvatar = asyncHandler(async (req, res) => {
-    if (!req.file) {
-      throw HttpError(400, "Send an image");
-    }
-    const { _id } = req.user;
-    const { path: oldPath, filename } = req.file;
-
-    const avatar = await usersAuthService.changeAvatar(_id, oldPath, filename);
-    res.status(200).json({
-      avatarURL: avatar.avatarURL,
-    });
-  });
-}
-
-module.exports = new UsersController();
+});
