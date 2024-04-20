@@ -1,16 +1,22 @@
 const mongoose = require("mongoose");
 
-const app = require('./app')
+require("colors");
 
-const {DB_HOST, PORT = 3000} = process.env;
+const app = require("./app");
 
-mongoose.set('strictQuery', true);
+const { DB_HOST, PORT } = process.env;
 
-mongoose.connect(DB_HOST)
+mongoose
+  .connect(DB_HOST)
   .then(() => {
-    app.listen(PORT)
+    app.listen(PORT, () => {
+      console.log(
+        `Server running. Use our API on port: ${PORT}`.green.italic.bold
+      );
+    });
+    console.log("Database connection successful".green.italic.bold);
   })
-  .catch(error => {
-    console.log(error.message);
+  .catch((error) => {
+    console.log(error.message.red.italic.bold);
     process.exit(1);
-  })
+  });

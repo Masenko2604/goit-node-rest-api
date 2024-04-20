@@ -37,33 +37,15 @@ const bookSchema = new Schema({
     }
 }, { versionKey: false, timestamps: true });
 
-contactSchema.post("save", handleMongooseError);
+bookSchema.post("save", handleMongooseError);
 
-const contactSchema = Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Set name for contact"],
-    },
-    email: {
-      type: String,
-      required: [true, "Set email for contact"],
-    },
-    phone: {
-      type: String,
-      required: [true, "Set phone number for contact"],
-    },
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-    },
-  },
-  { versionKey: false, timestamps: true }
-);
+const addSchema = Joi.object({
+    title: Joi.string().required(),
+    author: Joi.string().required(),
+    favorite: Joi.boolean(),
+    genre: Joi.string().valid(...genreList).required(),
+    date: Joi.string().pattern(dateRegexp).required(),
+});
 
 const updateFavoriteSchema = Joi.object({
     favorite: Joi.boolean().required(),
@@ -74,7 +56,7 @@ const schemas = {
     updateFavoriteSchema,
 }
 
-const Contact = model("contact", contactSchema);
+const Contact = model("book", bookSchema);
 
 module.exports = {
     Contact,
