@@ -82,4 +82,3 @@ export const uploadAvatar = multer({
     fieldSize: 2 * 1024 * 1024,
   },
 }).single("avatar");
-
