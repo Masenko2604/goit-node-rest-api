@@ -4,8 +4,7 @@
   "scripts": {
     "test": "jest",
     "start": "node ./sendEmail.js",
-    "dev": "nodemon ./server.js",
-    "start:dev": "npm run dev"
+    "dev": "nodemon ./server.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.3",
