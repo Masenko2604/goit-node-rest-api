@@ -4,28 +4,7 @@ import cors from "cors";
 import 'dotenv/config';
 import {contactsRouter} from "./routes/contactsRouter.js";
 import  {authRouter}  from './routes/api/auth.js';
-
-
-
-
-const sgMail = require("@sendgrid/mail");
-require("dotenv").config();
-
-const {SENDGRID_API_KEY} = process.env;
-
-sgMail.setApiKey(SENDGRID_API_KEY);
-
-const email = {
-  to: "go.tanja@meta.ua",
-  from: "tanjushka2604@gmail.com",
-  subject: "Test email",
-  html: " <p><strong>Test email</strong>from localhost:3000</p>"
-};
-
-sgMail.send(email)
-.then(()=> console.log("Email send success"))
-.catch(error => console.log(error.message))
-
+// import { NewAvatar } from "./temp/changeImg.js";
 
 
 export const app = express();
