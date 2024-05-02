@@ -1,5 +1,6 @@
 import "dotenv/config";
-import nodemailer from "nodemailer";
+import SendGrid from "SendGrid";
+
 
 const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD } = process.env;
 
@@ -13,7 +14,7 @@ const config = {
   },
 };
 
-const transporter = nodemailer.createTransport(config);
+const transporter = SendGrid.createTransport(config);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
