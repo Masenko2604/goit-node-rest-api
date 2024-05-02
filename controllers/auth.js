@@ -1,7 +1,7 @@
 import "dotenv/config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User } from "../models/User.js";
+import { User } from "../models/user.js";
 import gravatar from "gravatar";
 import path from "path";
 import fs from "fs/promises";

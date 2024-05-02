@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/User.js";
+import { User } from "../models/user.js";
 import { HttpError } from "../helpers/index.js";
 
 const { SECRET_KEY } = process.env;
 
-const authenticate = async (req, res, next) => {
+const validateJWT = async (req, res, next) => {
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
   if (bearer !== "Bearer") {
@@ -23,5 +23,5 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-export default authenticate;
+export default validateJWT;
  

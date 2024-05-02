@@ -1,5 +1,5 @@
 import express from "express";
-import { validateBody, authenticate, upload } from "../middlewars/index.js";
+import { validateBody, validateJWT, upload } from "../middlewars/index.js";
 import { schemas } from "../schemas/userSchemas.js";
 import { userControllers } from "../controllers/auth.js";
 import { emailControllers } from "../controllers/email.js";
@@ -18,19 +18,19 @@ authRouter.post(
   userControllers.login
 );
 
-authRouter.get("/current", authenticate, userControllers.getCurrent);
-authRouter.post("/logout", authenticate, userControllers.logout);
+authRouter.get("/current", validateJWT, userControllers.getCurrent);
+authRouter.post("/logout", validateJWT, userControllers.logout);
 
 authRouter.patch(
   "/",
-  authenticate,
+  validateJWT,
   validateBody(schemas.subscriptionSchema),
   userControllers.patchSubscription
 );
 
 authRouter.patch(
   "/avatars",
-  authenticate,
+  validateJWT,
   upload.single("avatar"),
   userControllers.updateAvatar
 );
