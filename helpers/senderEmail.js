@@ -1,35 +1,26 @@
 import "dotenv/config";
-import SendGrid from "SendGrid";
+import sendGridMail from '@sendgrid/mail';
 
 
-const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD } = process.env;
-
-const config = {
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: true,
-  auth: {
-    user: SMTP_USER,
-    pass: SMTP_PASSWORD,
-  },
-};
-
-const transporter = SendGrid.createTransport(config);
+sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
+  const msg = {
+    to,
+    from: process.env.SMTP_USER,
+    subject,
+    html,
+  };
+
   try {
-    await transporter.sendMail({
-      from: SMTP_USER,
-      to,
-      subject,
-      html,
-    });
+    await sendGridMail.send(msg);
+    console.log('Email sent successfully');
   } catch (error) {
+    console.error('Error sending email:', error);
     throw error;
   }
 };
 
 export default sendEmail;
-  
   
   
