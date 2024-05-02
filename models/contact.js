@@ -1,32 +1,28 @@
 import { Schema, model } from "mongoose";
-import { HandleMongooseError } from "../helpers/index.js";
+import { HandleMongooseError } from "../helpers/HandleMongooseError.js";
 
-const contactSchema = new Schema(
-  {
+const contactSchema = new Schema({
     name: {
-      type: String,
-      required: true,
+        type: String,
+        required: [true, 'Set name for contact'],
     },
     email: {
-      type: String,
-      required: true,
+        type: String,
     },
     phone: {
-      type: String,
-      required: true,
+        type: String,
     },
     favorite: {
-      type: Boolean,
-      default: false,
+        type: Boolean,
+        default: false,
     },
     owner: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-      required: true,
-    },
-  },
-  { versionKey: false }
-);
-contactSchema.post("save", HandleMongooseError);
+        type: Schema.Types.ObjectId,
+        ref: 'user',
+    }
+}, { versionKey: false });
 
-export const Contact = model("contact", contactSchema);
+contactSchema.post("save", HandleMongooseError);
+const Contact = model("contact", contactSchema)
+ 
+export { Contact };

@@ -5,7 +5,7 @@ dotenv.config();
 import app from "../app.js";
 import { userControllers } from "../controllers/auth.js";
 
-const { DB_URI } = process.env;
+const { DB_URL } = process.env;
 
 const ENDPOINT = "/users/login";
 const TEST_USER = {
@@ -15,10 +15,10 @@ const TEST_USER = {
 
 describe("test login controller", () => {
   beforeAll(async () => {
-    await mongoose.connect(DB_URI);
+    await mongoose.connect(DB_URL);
   });
   afterAll(async () => {
-    await mongoose.disconnect(DB_URI);
+    await mongoose.disconnect(DB_URL);
   });
 
   test("login controller returns status code 200", async () => {
