@@ -30,7 +30,7 @@ authRouter.patch(
 
 authRouter.patch(
   "/avatars",
-  validateJWT,
+  authenticate,
   upload.single("avatar"),
   userControllers.updateAvatar
 );
