@@ -9,8 +9,8 @@ import { schemas } from "../../schemas/usersSchemas.js";
  const authRouter = express.Router();
 
 authRouter.post("/register", validateBody(schemas.registerSchema), register);
-authRouter.get("/verify/:verificationToken", verifyEmail);
-authRouter.post("/verify", validateBody(schemas.emailSchema), resendVerifyEmail)
+authRouter.get("/verify/:verificationToken", resendVerifyEmail);
+authRouter.post("/verify", validateBody(schemas.emailSchema), verifyEmail)
 authRouter.post("/login", validateBody(schemas.loginSchema), login);
 authRouter.get("/current", authenticate, getCurrent);
 authRouter.post("/logout", authenticate, logout);
